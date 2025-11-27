@@ -3,9 +3,17 @@ venv/
 
 # Raw uncleaned data (keep only cleaned data in Git)
 data/mobile_money_transactions.csv
+mobile_money_transactions_cleaned.csv
 
-# Cleaned large CSV (share via Telegram/cloud, not Git)
-data/mobile_money_transactions_cleaned.csv
+# Cleaned large CSV (share via Telegram/cloud, not Git) below is your dataset 
+data/mobile_money_transactions_cleaned.csv 
+
+#my edit on the cleaned and analyzed data my dataset
+Real_clean_data.csv
+EDA_Full_Dataset.csv
 
 # Notebook-generated images
 *.png
+
+# data base files
+schema.sql
