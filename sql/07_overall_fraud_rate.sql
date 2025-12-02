@@ -4,6 +4,6 @@
 
 SELECT
     COUNT(*) AS total_tx,
-    SUM(CASE WHEN "isFraud" = 1 THEN 1 ELSE 0 END) AS fraud_tx,
-    100.0 * SUM(CASE WHEN "isFraud" = 1 THEN 1 ELSE 0 END) / COUNT(*) AS fraud_rate_pct
+    SUM(CASE WHEN isfraud THEN 1 ELSE 0 END) AS fraud_tx,
+    100.0 * SUM(CASE WHEN isfraud THEN 1 ELSE 0 END) / COUNT(*) AS fraud_rate_pct
 FROM mobile_money_transactions;

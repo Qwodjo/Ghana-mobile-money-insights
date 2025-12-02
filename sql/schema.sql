@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS mobile_money_transactions (
 
 	-- Behaviour / risk information from the original dataset
 	transactiontype     VARCHAR(50) NOT NULL,           -- e.g. CASH_IN, TRANSFER, PAYMENT
-	isFraud             BOOLEAN NOT NULL,               -- TRUE for fraud, FALSE otherwise
+	isfraud             BOOLEAN NOT NULL,               -- TRUE for fraud, FALSE otherwise
 
 	-- When the row was loaded into the database
 	created_at          TIMESTAMPTZ DEFAULT NOW()
@@ -67,8 +67,8 @@ CREATE INDEX IF NOT EXISTS idx_mmt_transactiontype
 	ON mobile_money_transactions (transactiontype);
 
 -- Index to speed up fraud analysis
-CREATE INDEX IF NOT EXISTS idx_mmt_isFraud
-	ON mobile_money_transactions (isFraud);
+CREATE INDEX IF NOT EXISTS idx_mmt_isfraud
+	ON mobile_money_transactions (isfraud);
 
 
 
