@@ -11,3 +11,4 @@ data/mobile_money_transactions_cleaned.csv
 *.png
 .vscode/
 src/__pycache__/
+dags/__pycache__/

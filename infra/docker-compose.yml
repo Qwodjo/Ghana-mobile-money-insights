@@ -1,0 +1,79 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: mm_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: mm_user
+      POSTGRES_PASSWORD: mm_password
+      POSTGRES_DB: mm_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  airflow:
+    image: apache/airflow:2.9.0
+    container_name: mm_airflow
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - ../.env
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://mm_user:mm_password@postgres:5432/mm_db
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__WEBSERVER__RBAC=True
+      - AIRFLOW__WEBSERVER__SECRET_KEY=this_is_a_dev_only_secret_key_change_later
+      # Install extra Python libraries into the Airflow image at startup.
+      # We need boto3 so the DAG can upload files to S3.
+      - _PIP_ADDITIONAL_REQUIREMENTS=boto3
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    volumes:
+      # Mount DAGs folder so Airflow can discover your DAG files
+      - ../dags:/opt/airflow/dags
+      # Mount the whole project so DAGs can import src.* modules and access data/
+      - ..:/opt/airflow/project
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
+      airflow webserver
+      "
+
+  airflow_scheduler:
+    image: apache/airflow:2.9.0
+    container_name: mm_airflow_scheduler
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - ../.env
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://mm_user:mm_password@postgres:5432/mm_db
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__WEBSERVER__RBAC=True
+      - AIRFLOW__WEBSERVER__SECRET_KEY=this_is_a_dev_only_secret_key_change_later
+      - _PIP_ADDITIONAL_REQUIREMENTS=boto3
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    volumes:
+      - ../dags:/opt/airflow/dags
+      - ..:/opt/airflow/project
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow scheduler
+      "
+
+volumes:
+  pgdata:
